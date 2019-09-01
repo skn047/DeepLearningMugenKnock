@@ -46,3 +46,5 @@ class Mynet(torch.nn.Module):
         self.enc1 = torch.nn.Sequential(*enc1)
 
         self.out = torch.nn.Conv2d(32, 1, kernel_size, padding=0, stride=1)
+
+    def foward

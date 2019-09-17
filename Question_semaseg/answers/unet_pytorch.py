@@ -20,7 +20,7 @@ def crop_layer(layer, size):
     pw = int((w - _w) / 2)
     return layer[:, :, ph:ph+_h, pw:pw+_w]
 
-    
+
 class Mynet(torch.nn.Module):
     def __init__(self):
         super(Mynet, self).__init__()
@@ -71,7 +71,7 @@ class Mynet(torch.nn.Module):
             self.dec4.add_module("dec4_{}".format(i+1), torch.nn.Conv2d(f, base*8, kernel_size=3, padding=0, stride=1))
             self.dec4.add_module("dec4_relu_{}".format(i+1), torch.nn.ReLU())
             self.dec4.add_module("dec4_bn_{}".format(i+1), torch.nn.BatchNorm2d(base*8))
-        
+
 
         self.tconv3 = torch.nn.ConvTranspose2d(base*8, base*4, kernel_size=2, stride=2)
         self.tconv3_bn = torch.nn.BatchNorm2d(base*4)
@@ -104,25 +104,25 @@ class Mynet(torch.nn.Module):
             self.dec1.add_module("dec1_bn_{}".format(i+1), torch.nn.BatchNorm2d(base))
 
         self.out = torch.nn.Conv2d(base, num_classes+1, kernel_size=1, padding=0, stride=1)
-        
-        
+
+
     def forward(self, x):
         # block conv1
         x_enc1 = self.enc1(x)
         x = F.max_pool2d(x_enc1, 2, stride=2, padding=0)
-        
+
         # block conv2
         x_enc2 = self.enc2(x)
         x = F.max_pool2d(x_enc2, 2, stride=2, padding=0)
-        
+
         # block conv31
         x_enc3 = self.enc3(x)
         x = F.max_pool2d(x_enc3, 2, stride=2, padding=0)
-        
+
         # block conv4
         x_enc4 = self.enc4(x)
         x = F.max_pool2d(x_enc4, 2, stride=2, padding=0)
-        
+
         # block conv5
         x = self.enc5(x)
 
@@ -149,18 +149,18 @@ class Mynet(torch.nn.Module):
         x = self.dec1(x)
 
         x = self.out(x)
-        
+
         return x
 
 CLS = {'akahara': [0,0,128],
        'madara': [0,128,0]}
-    
+
 # get train data
 def data_load(path, hf=False, vf=False):
     xs = []
     ts = []
     paths = []
-    
+
     for dir_path in glob(path + '/*'):
         for path in glob(dir_path + '/*'):
             x = cv2.imread(path)
@@ -184,7 +184,7 @@ def data_load(path, hf=False, vf=False):
             #plt.show()
 
             ts.append(t)
-            
+
             paths.append(path)
 
             if hf:
@@ -206,7 +206,7 @@ def data_load(path, hf=False, vf=False):
     ts = np.array(ts)
 
     xs = xs.transpose(0,3,1,2)
-    
+
     return xs, ts, paths
 
 
@@ -228,7 +228,7 @@ def train():
     train_ind = np.arange(len(xs))
     np.random.seed(0)
     np.random.shuffle(train_ind)
-    
+
     for i in range(100):
         if mbi + mb > len(xs):
             mb_ind = train_ind[mbi:]
@@ -248,15 +248,15 @@ def train():
         y = y.permute(0,2,3,1).contiguous()
         y = y.view(-1, num_classes+1)
         t = t.view(-1)
-        
+
         y = F.log_softmax(y, dim=1)
         loss = torch.nn.CrossEntropyLoss()(y, t)
         loss.backward()
         opt.step()
-    
+
         pred = y.argmax(dim=1, keepdim=True)
         acc = pred.eq(t.view_as(pred)).sum().item() / mb
-        
+
         print("iter >>", i+1, ',loss >>', loss.item(), ',accuracy >>', acc)
 
     torch.save(model.state_dict(), 'cnn.pt')
@@ -274,12 +274,12 @@ def test():
         x = xs[i]
         t = ts[i]
         path = paths[i]
-        
+
         x = np.expand_dims(x, axis=0)
         x = torch.tensor(x, dtype=torch.float).to(device)
-        
+
         pred = model(x)
-    
+
         pred = pred.permute(0,2,3,1).reshape(-1, num_classes+1)
         pred = F.softmax(pred, dim=1)
         pred = pred.reshape(-1, out_height, out_width, num_classes+1)
@@ -292,13 +292,13 @@ def test():
             out[pred == (i+1)] = vs
 
         print("in {}".format(path))
-        
+
         plt.subplot(1,2,1)
         plt.imshow(x.detach().cpu().numpy()[0].transpose(1,2,0))
         plt.subplot(1,2,2)
         plt.imshow(out[..., ::-1])
         plt.show()
-    
+
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='CNN implemented with Keras')

@@ -12,7 +12,7 @@ out_height, out_width = 64, 64#388, 388
 GPU = False
 torch.manual_seed(0)
 
-    
+
 class Mynet(torch.nn.Module):
     def __init__(self):
         super(Mynet, self).__init__()
@@ -26,23 +26,23 @@ class Mynet(torch.nn.Module):
         self.enc1 = torch.nn.Sequential(*enc1)
 
         self.out = torch.nn.Conv2d(32, 1, kernel_size=1, padding=0, stride=1)
-        
+
     def forward(self, x):
         # block conv1
         x = self.enc1(x)
         x = self.out(x)
         return x
 
-    
+
 CLS = {'akahara': [0,0,128],
        'madara': [0,128,0]}
-    
+
 # get train data
 def data_load(path, hf=False, vf=False):
     xs = []
     ts = []
     paths = []
-    
+
     for dir_path in glob(path + '/*'):
         for path in glob(dir_path + '/*'):
             x = cv2.imread(path)
@@ -66,7 +66,7 @@ def data_load(path, hf=False, vf=False):
             #plt.show()
 
             ts.append(t)
-            
+
             paths.append(path)
 
             if hf:
@@ -110,7 +110,7 @@ def train():
     train_ind = np.arange(len(xs))
     np.random.seed(0)
     np.random.shuffle(train_ind)
-    
+
     for i in range(500):
         if mbi + mb > len(xs):
             mb_ind = train_ind[mbi:]
@@ -128,20 +128,20 @@ def train():
         y = model(x)
 
         y = y.permute(0,2,3,1).contiguous()
-        
+
         y = torch.sigmoid(y)
         loss = torch.nn.BCELoss()(y, t)
         loss.backward()
         opt.step()
-    
+
         #pred = y.argmax(dim=1, keepdim=True)
         acc = y.eq(t.view_as(y)).sum().item() / mb
-        
+
         print("iter >>", i+1, ',loss >>', loss.item(), ',accuracy >>', acc)
 
     torch.save(model.state_dict(), 'cnn.pt')
 
-    
+
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='CNN implemented with Keras')

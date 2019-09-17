@@ -10,13 +10,13 @@ img_height, img_width = 64, 64#572, 572
 out_height, out_width = 64, 64#388, 388
 GPU = False
 torch.manual_seed(0)
-    
+
 # get train data
 def data_load(path, hf=False, vf=False):
     xs = []
     ts = []
     paths = []
-    
+
     for dir_path in glob(path + '/*'):
         for path in glob(dir_path + '/*'):
             x = cv2.imread(path)
@@ -40,7 +40,7 @@ def data_load(path, hf=False, vf=False):
             #plt.show()
 
             ts.append(t)
-            
+
             paths.append(path)
 
             if hf:
@@ -66,8 +66,6 @@ def data_load(path, hf=False, vf=False):
     return xs, ts, paths
 
 
-
-    
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='CNN implemented with Keras')

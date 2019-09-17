@@ -14,7 +14,7 @@ def data_load(path):
     xs = []
     ts = []
     paths = []
-    
+
     for dir_path in glob(path + '/*'):
         for path in glob(dir_path + '/*'):
             x = cv2.imread(path)
@@ -25,14 +25,14 @@ def data_load(path):
             for i, cls in enumerate(CLS):
                 if cls in path:
                     t = i
-            
+
             ts.append(t)
 
             paths.append(path)
 
     xs = np.array(xs, dtype=np.float32)
     ts = np.array(ts, dtype=np.int)
-    
+
     xs = xs.transpose(0,3,1,2)
 
     return xs, ts, paths

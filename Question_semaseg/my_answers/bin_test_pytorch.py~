@@ -1,0 +1,16 @@
+import torch
+import torch.nn.functional as F
+import argparse
+import cv2
+import numpy as np
+from glob import glob
+import matplotlib.pyplot as plt
+
+num_classes = 2
+img_height, img_width = 64, 64
+out_height, out_height = 64, 64
+GPU = False
+torch.manual_seed(0)
+
+class Mynet(torch.nn.Module):
+    def __init
